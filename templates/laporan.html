@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan - Smart Retail</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, sans-serif;
+            background: #0b1120;
+            color: #e2e8f0;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 24px 40px;
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: clamp(1.9rem, 2.5vw, 2.6rem);
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            margin-right: 16px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: rgba(17, 33, 63, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            margin: 10px 0 0;
+            color: #22c55e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th,
+        td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        th {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        @media (max-width: 720px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div>
+                <h1>Laporan</h1>
+                <p>Ringkasan penjualan, keuntungan, dan stok untuk toko Smart Retail.</p>
+            </div>
+            <nav class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('produk') }}">Produk</a>
+                <a href="{{ url_for('transaksi') }}">Transaksi</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </nav>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Total Transaksi</h2>
+                <div class="stat-value">{{ total_transaksi }}</div>
+            </div>
+            <div class="card">
+                <h2>Total Pendapatan</h2>
+                <div class="stat-value">Rp {{ total_pendapatan }}</div>
+            </div>
+            <div class="card">
+                <h2>Total Keuntungan</h2>
+                <div class="stat-value">Rp {{ total_keuntungan }}</div>
+            </div>
+            <div class="card">
+                <h2>Jumlah Produk</h2>
+                <div class="stat-value">{{ total_produk }}</div>
+            </div>
+        </div>
+
+        <section class="card">
+            <h2>Produk Terlaris</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produk</th>
+                        <th>Jumlah Terjual</th>
+                        <th>Pendapatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in terlaris %}
+                    <tr>
+                        <td>{{ item.nama_produk }}</td>
+                        <td>{{ item.jumlah_terjual }}</td>
+                        <td>Rp {{ item.pendapatan }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3">Belum ada data transaksi.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card">
+            <h2>Stok Rendah</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produk</th>
+                        <th>Stok</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in stok_rendah %}
+                    <tr>
+                        <td>{{ item.nama_produk }}</td>
+                        <td>{{ item.stok }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2">Tidak ada produk dengan stok rendah.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+</body>
+</html>

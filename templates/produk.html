@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produk - Smart Retail</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, sans-serif;
+            background: #0b1120;
+            color: #e2e8f0;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 24px 40px;
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: clamp(1.9rem, 2.5vw, 2.6rem);
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            margin-right: 16px;
+        }
+
+        .card {
+            background: rgba(17, 33, 63, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        form {
+            display: grid;
+            gap: 16px;
+        }
+
+        label {
+            display: grid;
+            gap: 8px;
+            color: #cbd5e1;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        button {
+            width: fit-content;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            color: #0b1120;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 14px 18px;
+            border-radius: 14px;
+        }
+
+        .message.error {
+            background: #f87171;
+            color: #fff;
+        }
+
+        .message.success {
+            background: #22c55e;
+            color: #0b1120;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th,
+        td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        th {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        a.delete-link {
+            color: #f87171;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 720px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div>
+                <h1>Produk</h1>
+                <p>Tambah dan kelola stok produk untuk toko Smart Retail.</p>
+            </div>
+            <nav class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('transaksi') }}">Transaksi</a>
+                {% if user.role == 'admin' %}
+                <a href="{{ url_for('laporan') }}">Laporan</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </nav>
+        </header>
+
+        <section class="card">
+            <h2>Cari Produk</h2>
+            <form method="get" action="{{ url_for('produk') }}">
+                <label>
+                    Cari berdasarkan ID atau Nama Produk
+                    <input type="text" name="q" placeholder="Contoh: gula atau 2" value="{{ query }}">
+                </label>
+                <button type="submit">Cari</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Tambah Produk Baru</h2>
+            {% if user.role != 'admin' %}
+            <p style="color: #cbd5e1;">Hanya admin yang dapat menambahkan produk baru.</p>
+            {% endif %}
+            {% if error %}
+            <div class="message error">{{ error }}</div>
+            {% endif %}
+            {% if success %}
+            <div class="message success">{{ success }}</div>
+            {% endif %}
+            {% if user.role == 'admin' %}
+            <form method="post" action="{{ url_for('produk') }}">
+                <label>
+                    Nama Produk
+                    <input type="text" name="nama_produk" placeholder="Contoh: Susu Kental Manis" required>
+                </label>
+                <label>
+                    Harga Modal
+                    <input type="number" name="harga_modal" placeholder="0" min="0" required>
+                </label>
+                <label>
+                    Harga Jual
+                    <input type="number" name="harga_jual" placeholder="0" min="0" required>
+                </label>
+                <label>
+                    Stok
+                    <input type="number" name="stok" placeholder="0" min="0" required>
+                </label>
+                <button type="submit">Tambah Produk</button>
+            </form>
+            {% endif %}
+        </section>
+
+        <section class="card">
+            <h2>Daftar Produk</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama</th>
+                        <th>Harga Modal</th>
+                        <th>Harga Jual</th>
+                        <th>Stok</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in produk %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.nama_produk }}</td>
+                        <td>{{ item.harga_modal }}</td>
+                        <td>{{ item.harga_jual }}</td>
+                        <td>{{ item.stok }}</td>
+                        <td>
+                            {% if user.role == 'admin' %}
+                            <a class="delete-link" href="{{ url_for('hapus_produk', product_id=item.id) }}" onclick="return confirm('Hapus produk ini?')">Hapus</a>
+                            <br>
+                            <a class="delete-link" href="{{ url_for('ubah_produk', product_id=item.id) }}">Edit</a>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6">Belum ada produk.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+</body>
+</html>
