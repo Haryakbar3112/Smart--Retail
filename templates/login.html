@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Smart Retail</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 24px;
+            display: grid;
+            place-items: center;
+            font-family: Inter, system-ui, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        .login-card {
+            width: min(520px, 100%);
+            padding: 40px;
+            border-radius: 24px;
+            background: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        }
+        .login-card h1 {
+            margin: 0 0 18px;
+            font-size: 2rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 14px;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+        input {
+            width: 100%;
+            padding: 18px 22px;
+            border-radius: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: #111827;
+            color: #e2e8f0;
+            margin-top: 8px;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            color: #0b1120;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        @media (max-width: 520px) {
+            .login-card {
+                padding: 28px;
+            }
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
+        }
+        .message.error {
+            background: #f87171;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h1>Login</h1>
+        {% if error %}
+        <div class="message error">{{ error }}</div>
+        {% endif %}
+        <form method="post" action="{{ url_for('login') }}">
+            <label>
+                Username
+                <input type="text" name="username" placeholder="Masukkan username" required>
+            </label>
+            <label>
+                Password
+                <input type="password" name="password" placeholder="Masukkan password" required>
+            </label>
+            <button type="submit">Masuk</button>
+        </form>
+    </div>
+</body>
+</html>
