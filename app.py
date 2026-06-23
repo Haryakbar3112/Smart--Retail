@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "super-secret-key")
 
 DATABASE = "smart_retail.db"
-
+#riwayat
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
