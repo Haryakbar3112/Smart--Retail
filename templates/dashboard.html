@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Smart Retail</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, system-ui, sans-serif;
+            background: linear-gradient(180deg, #071426 0%, #0f172a 100%);
+            color: #e2e8f0;
+        }
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px 40px;
+        }
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .eyebrow {
+            margin: 0 0 10px;
+            letter-spacing: 0.18em;
+            color: #7dd3fc;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 3vw, 2.8rem);
+            line-height: 1.05;
+        }
+        p.lead {
+            margin: 12px 0 0;
+            color: #cbd5e1;
+            max-width: 720px;
+            line-height: 1.75;
+        }
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .nav-links a {
+            padding: 12px 18px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+        }
+        .card h2 {
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+            color: #cbd5e1;
+        }
+        .stat-value {
+            margin: 0;
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #22c55e;
+        }
+        .note {
+            margin-top: 24px;
+            color: #94a3b8;
+            line-height: 1.75;
+        }
+        @media (max-width: 720px) {
+            header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div>
+                <p class="eyebrow">Dashboard</p>
+                <h1>Selamat datang, {{ user.username }}.</h1>
+                <p class="lead">Anda masuk sebagai <strong>{{ user.role|capitalize }}</strong>. Gunakan menu untuk mengelola produk, mencatat transaksi, dan melihat laporan.</p>
+            </div>
+            <nav class="nav-links">
+                <a href="{{ url_for('produk') }}">Produk</a>
+                <a href="{{ url_for('transaksi') }}">Transaksi</a>
+                <a href="{{ url_for('keranjang') }}">Keranjang</a>
+                <a href="{{ url_for('struk') }}">Struk</a>
+                {% if user.role == 'admin' %}
+                <a href="{{ url_for('laporan') }}">Laporan</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </nav>
+        </header>
+
+        <div class="grid">
+            <section class="card">
+                <h2>Total Produk</h2>
+                <p class="stat-value">{{ total_produk }}</p>
+            </section>
+            <section class="card">
+                <h2>Total Transaksi</h2>
+                <p class="stat-value">{{ total_transaksi }}</p>
+            </section>
+            <section class="card">
+                <h2>Total Pendapatan</h2>
+                <p class="stat-value">Rp {{ total_pendapatan }}</p>
+            </section>
+        </div>
+
+        <section class="card note">
+            <p>Admin dapat menambahkan, mengubah, dan menghapus produk. Kasir dapat mencatat transaksi dan melihat data penjualan.</p>
+        </section>
+    </div>
+</body>
+</html>
