@@ -65,14 +65,15 @@
         select,
         input[type="number"] {
             width: 100%;
-            padding: 12px 14px;
-            border-radius: 14px;
+            padding: 12px 2px;
+            border-radius: 999px;
             border: 1px solid rgba(148, 163, 184, 0.18);
             background: #0f172a;
             color: #e2e8f0;
         }
 
-        button {
+        button,
+        .button-link {
             width: fit-content;
             padding: 12px 20px;
             border: none;
@@ -81,6 +82,7 @@
             color: #0b1120;
             font-weight: 700;
             cursor: pointer;
+            text-decoration: none;
         }
 
         .message {
@@ -97,6 +99,21 @@
         .message.success {
             background: #22c55e;
             color: #0b1120;
+        }
+
+        .cart-summary {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .cart-total {
+            margin: 0;
+            color: #22c55e;
+            font-size: 1.4rem;
+            font-weight: 800;
         }
 
         table {
@@ -117,6 +134,12 @@
             font-weight: 600;
         }
 
+        .receipt-link {
+            color: #7dd3fc;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
         @media (max-width: 720px) {
             header {
                 flex-direction: column;
@@ -130,11 +153,13 @@
         <header>
             <div>
                 <h1>Transaksi</h1>
-                <p>Catat penjualan dan pantau riwayat transaksi toko Anda.</p>
+                <p>Masukkan produk ke keranjang lalu checkout untuk membuat struk.</p>
             </div>
             <nav class="nav-links">
                 <a href="{{ url_for('dashboard') }}">Dashboard</a>
                 <a href="{{ url_for('produk') }}">Produk</a>
+                <a href="{{ url_for('keranjang') }}">Keranjang</a>
+                <a href="{{ url_for('struk') }}">Struk</a>
                 {% if user.role == 'admin' %}
                 <a href="{{ url_for('laporan') }}">Laporan</a>
                 {% endif %}
@@ -143,7 +168,7 @@
         </header>
 
         <section class="card">
-            <h2>Tambah Transaksi Baru</h2>
+            <h2>Tambah ke Keranjang</h2>
             {% if error %}
             <div class="message error">{{ error }}</div>
             {% endif %}
@@ -156,7 +181,7 @@
                     <select name="produk_id" required>
                         <option value="">Pilih produk</option>
                         {% for item in produk %}
-                        <option value="{{ item.id }}">{{ item.nama_produk }} (Stok: {{ item.stok }})</option>
+                        <option value="{{ item.id }}">{{ item.nama_produk }} - Rp {{ item.harga_jual }} (Stok: {{ item.stok }})</option>
                         {% endfor %}
                     </select>
                 </label>
@@ -164,8 +189,19 @@
                     Jumlah
                     <input type="number" name="jumlah" min="1" placeholder="Jumlah" required>
                 </label>
-                <button type="submit">Simpan Transaksi</button>
+                <button type="submit">Tambah ke Keranjang</button>
             </form>
+        </section>
+
+        <section class="card">
+            <div class="cart-summary">
+                <div>
+                    <h2>Keranjang Aktif</h2>
+                    <p>{{ keranjang.daftar_item|length }} item siap checkout.</p>
+                </div>
+                <p class="cart-total">Rp {{ keranjang.total }}</p>
+                <a class="button-link" href="{{ url_for('keranjang') }}">Lihat Keranjang</a>
+            </div>
         </section>
 
         <section class="card">
@@ -178,6 +214,7 @@
                         <th>Jumlah</th>
                         <th>Total</th>
                         <th>Tanggal</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -188,10 +225,11 @@
                         <td>{{ trx.jumlah }}</td>
                         <td>{{ trx.total }}</td>
                         <td>{{ trx.created_at }}</td>
+                        <td><a class="receipt-link" href="{{ url_for('struk_detail', kode_struk=trx.kode_struk_tampil) }}">Struk</a></td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5">Belum ada transaksi.</td>
+                        <td colspan="6">Belum ada transaksi.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

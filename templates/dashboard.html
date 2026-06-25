@@ -103,6 +103,8 @@
             <nav class="nav-links">
                 <a href="{{ url_for('produk') }}">Produk</a>
                 <a href="{{ url_for('transaksi') }}">Transaksi</a>
+                <a href="{{ url_for('keranjang') }}">Keranjang</a>
+                <a href="{{ url_for('struk') }}">Struk</a>
                 {% if user.role == 'admin' %}
                 <a href="{{ url_for('laporan') }}">Laporan</a>
                 {% endif %}

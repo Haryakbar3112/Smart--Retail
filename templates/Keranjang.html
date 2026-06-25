@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang - Smart Retail</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, sans-serif;
+            background: #0b1120;
+            color: #e2e8f0;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 28px 24px 40px;
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: clamp(1.9rem, 2.5vw, 2.6rem);
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            margin-right: 16px;
+        }
+
+        .card {
+            background: rgba(17, 33, 63, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th,
+        td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        th {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .summary {
+            display: grid;
+            gap: 10px;
+            max-width: 420px;
+            margin-left: auto;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .summary-total {
+            border-top: 1px solid rgba(148, 163, 184, 0.24);
+            padding-top: 12px;
+            color: #22c55e;
+            font-size: 1.35rem;
+            font-weight: 800;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        button,
+        .button-link {
+            width: fit-content;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            color: #0b1120;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .danger-link {
+            color: #f87171;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 14px 18px;
+            border-radius: 14px;
+        }
+
+        .message.error {
+            background: #f87171;
+            color: #fff;
+        }
+
+        @media (max-width: 720px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .summary {
+                margin-left: 0;
+            }
+        }
+            .payment-card{
+            background:#fff;
+            padding:20px;
+            border-radius:15px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.1);
+            margin-top:20px;
+        }
+
+        .payment-card h3{
+            margin-bottom:15px;
+            color:#333;
+        }
+
+        .payment-info{
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:20px;
+            padding:12px;
+            background:#f5f7fa;
+            border-radius:10px;
+            font-size:18px;
+        }
+
+        .payment-card input{
+            width:100%;
+            padding:12px;
+            border:1px solid #ddd;
+            border-radius:10px;
+            margin-top:8px;
+            margin-bottom:15px;
+        }
+
+        .payment-card button{
+            width:100%;
+            padding:12px;
+            background:#28a745;
+            color:white;
+            border:none;
+            border-radius:10px;
+            font-size:16px;
+            cursor:pointer;
+        }
+
+        .payment-card button:hover{
+            background:#218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div>
+                <h1>Keranjang</h1>
+                <p>Periksa rincian pembelian sebelum checkout.</p>
+            </div>
+            <nav class="nav-links">
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('produk') }}">Produk</a>
+                <a href="{{ url_for('transaksi') }}">Transaksi</a>
+                <a href="{{ url_for('struk') }}">Struk</a>
+                {% if user.role == 'admin' %}
+                <a href="{{ url_for('laporan') }}">Laporan</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </nav>
+        </header>
+
+        <section class="card">
+            <h2>Daftar Belanja</h2>
+            {% if error %}
+            <div class="message error">{{ error }}</div>
+            {% endif %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produk</th>
+                        <th>Harga</th>
+                        <th>Jumlah</th>
+                        <th>Subtotal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in keranjang.daftar_item %}
+                    <tr>
+                        <td>{{ item.nama_produk }}</td>
+                        <td>Rp {{ item.harga_jual }}</td>
+                        <td>{{ item.jumlah }}</td>
+                        <td>Rp {{ item.subtotal }}</td>
+                        <td><a class="danger-link" href="{{ url_for('hapus_keranjang', produk_id=item.produk_id) }}">Hapus</a></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">Keranjang masih kosong.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card">
+            <h2>Ringkasan</h2>
+            <div class="summary">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <strong>Rp {{ keranjang.subtotal }}</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Diskon {{ keranjang.diskon_persen }}%</span>
+                    <strong>Rp {{ keranjang.diskon }}</strong>
+                </div>
+                <div class="summary-row summary-total">
+                    <span>Total Bayar</span>
+                    <span>Rp {{ keranjang.total }}</span>
+                </div>
+            </div>
+            <div class="actions">
+                <a class="button-link" href="{{ url_for('transaksi') }}">Tambah Produk</a>
+                {% if keranjang.daftar_item %}
+                <a class="danger-link" href="{{ url_for('kosongkan_keranjang') }}">Kosongkan</a>
+                <form method="post" action="{{ url_for('checkout_keranjang') }}">
+                    <button type="submit">Checkout</button>
+                </form>
+                {% endif %}
+            </div>
+        </section>
+        <div class="payment-card">
+    <h3>Pembayaran</h3>
+
+    <div class="payment-info">
+        <span>Total Belanja</span>
+        <strong>Rp {{ "{:,.0f}".format(keranjang.total).replace(",", ".") }}</strong>
+    </div>
+
+    <form method="post" action="{{ url_for('checkout_keranjang') }}">
+        <label>Uang Bayar</label>
+        <input
+            type="number"
+            name="uang_bayar"
+            min="{{ keranjang.total }}"
+            required
+            placeholder="Masukkan uang pelanggan">
+
+        <button type="submit">
+            Proses Pembayaran
+        </button>
+    </form>
+</div>
+    </div>
+</body>
+</html>
