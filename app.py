@@ -1,5 +1,7 @@
 ﻿import os
-from flask import Flask, render_template, request, redirect, url_for, session
+import csv
+from io import StringIO
+from flask import Flask, render_template, request, redirect, url_for, session, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 from datetime import datetime
@@ -164,6 +166,18 @@ def require_admin():
         return redirect(url_for("login"))
     if session.get("role") != "admin":
         return redirect(url_for("dashboard"))
+
+
+def get_laporan_periode(periode):
+    periode = (periode or "harian").lower()
+    if periode == "mingguan":
+        where_clause = "WHERE date(created_at) BETWEEN date('now', '-6 days') AND date('now')"
+        periode_label = "Laporan 7 Hari Terakhir"
+    else:
+        periode = "harian"
+        where_clause = "WHERE date(created_at) = date('now')"
+        periode_label = "Laporan Hari Ini"
+    return periode, where_clause, periode_label
 
 
 initialize_database()
@@ -473,6 +487,28 @@ def checkout_keranjang():
             user=get_user(),
         )
 
+    uang_bayar_raw = request.form.get("uang_bayar", "").strip()
+    try:
+        uang_bayar = int(uang_bayar_raw)
+    except (ValueError, TypeError):
+        conn.close()
+        return render_template(
+            "Keranjang.html",
+            keranjang=ringkasan_keranjang,
+            error="Masukkan nominal uang bayar yang valid.",
+            user=get_user(),
+        )
+
+    if uang_bayar < ringkasan_keranjang["total"]:
+        kekurangan = ringkasan_keranjang["total"] - uang_bayar
+        conn.close()
+        return render_template(
+            "Keranjang.html",
+            keranjang=ringkasan_keranjang,
+            error=f"Uang pembayaran kurang. Kekurangan Rp {kekurangan}.",
+            user=get_user(),
+        )
+
     for item in ringkasan_keranjang["daftar_item"]:
         produk_item = conn.execute(
             "SELECT stok FROM produk WHERE id = ?", (item["produk_id"],)
@@ -604,16 +640,18 @@ def laporan():
     if redirect_result:
         return redirect_result
 
+    periode, where_clause, periode_label = get_laporan_periode(request.args.get("periode", "harian"))
+
     conn = get_db_connection()
-    total_transaksi = conn.execute("SELECT COUNT(*) AS total FROM transaksi").fetchone()["total"]
-    total_pendapatan = conn.execute("SELECT COALESCE(SUM(total), 0) AS total FROM transaksi").fetchone()["total"]
+    total_transaksi = conn.execute(f"SELECT COUNT(*) AS total FROM transaksi {where_clause}").fetchone()["total"]
+    total_pendapatan = conn.execute(f"SELECT COALESCE(SUM(total), 0) AS total FROM transaksi {where_clause}").fetchone()["total"]
     total_produk = conn.execute("SELECT COUNT(*) AS total FROM produk").fetchone()["total"]
     total_keuntungan = conn.execute(
-        "SELECT COALESCE(SUM((p.harga_jual - p.harga_modal) * t.jumlah), 0) AS total FROM transaksi t JOIN produk p ON p.id = t.produk_id"
+        f"SELECT COALESCE(SUM((p.harga_jual - p.harga_modal) * t.jumlah), 0) AS total FROM transaksi t JOIN produk p ON p.id = t.produk_id {where_clause}"
     ).fetchone()["total"]
     terlaris = conn.execute(
-        "SELECT p.nama_produk, SUM(t.jumlah) AS jumlah_terjual, SUM(t.total) AS pendapatan "
-        "FROM transaksi t JOIN produk p ON p.id = t.produk_id "
+        f"SELECT p.nama_produk, SUM(t.jumlah) AS jumlah_terjual, SUM(t.total) AS pendapatan "
+        f"FROM transaksi t JOIN produk p ON p.id = t.produk_id {where_clause} "
         "GROUP BY p.id ORDER BY jumlah_terjual DESC LIMIT 5"
     ).fetchall()
     stok_rendah = conn.execute("SELECT * FROM produk WHERE stok <= 5 ORDER BY stok ASC").fetchall()
@@ -627,8 +665,39 @@ def laporan():
         total_produk=total_produk,
         terlaris=terlaris,
         stok_rendah=stok_rendah,
+        periode=periode,
+        periode_label=periode_label,
         user=get_user(),
     )
+
+
+@app.route("/laporan/csv")
+def laporan_csv():
+    redirect_result = require_login()
+    if redirect_result:
+        return redirect_result
+    redirect_result = require_admin()
+    if redirect_result:
+        return redirect_result
+
+    periode, where_clause, _ = get_laporan_periode(request.args.get("periode", "harian"))
+    conn = get_db_connection()
+    rows = conn.execute(
+        f"SELECT t.created_at, COALESCE(t.kode_struk, CAST(t.id AS TEXT)) AS kode_struk, p.nama_produk, t.jumlah, t.total "
+        f"FROM transaksi t JOIN produk p ON p.id = t.produk_id {where_clause} "
+        "ORDER BY t.created_at DESC, t.id DESC"
+    ).fetchall()
+    conn.close()
+
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Tanggal", "Kode Struk", "Produk", "Jumlah", "Total"])
+    for row in rows:
+        writer.writerow([row["created_at"], row["kode_struk"], row["nama_produk"], row["jumlah"], row["total"]])
+
+    response = Response(output.getvalue(), mimetype="text/csv")
+    response.headers["Content-Disposition"] = f"attachment; filename=laporan_{periode}.csv"
+    return response
 
 
 @app.route("/logout")

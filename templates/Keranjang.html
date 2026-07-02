@@ -10,10 +10,11 @@
             font-family: Inter, system-ui, sans-serif;
             background: #0b1120;
             color: #e2e8f0;
+            overflow-x: hidden;
         }
 
         .page {
-            max-width: 1100px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 28px 24px 40px;
         }
@@ -159,10 +160,11 @@
             background:#f5f7fa;
             border-radius:10px;
             font-size:18px;
+            color: #000;
         }
 
         .payment-card input{
-            width:100%;
+            width:98%;
             padding:12px;
             border:1px solid #ddd;
             border-radius:10px;
@@ -183,6 +185,10 @@
 
         .payment-card button:hover{
             background:#218838;
+        }
+        .uang_bayar{
+            color:#000;
+            
         }
     </style>
 </head>
@@ -239,45 +245,55 @@
         </section>
 
         <section class="card">
-            <h2>Ringkasan</h2>
-            <div class="summary">
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <strong>Rp {{ keranjang.subtotal }}</strong>
-                </div>
-                <div class="summary-row">
-                    <span>Diskon {{ keranjang.diskon_persen }}%</span>
-                    <strong>Rp {{ keranjang.diskon }}</strong>
-                </div>
-                <div class="summary-row summary-total">
-                    <span>Total Bayar</span>
-                    <span>Rp {{ keranjang.total }}</span>
-                </div>
-            </div>
-            <div class="actions">
-                <a class="button-link" href="{{ url_for('transaksi') }}">Tambah Produk</a>
-                {% if keranjang.daftar_item %}
-                <a class="danger-link" href="{{ url_for('kosongkan_keranjang') }}">Kosongkan</a>
-                <form method="post" action="{{ url_for('checkout_keranjang') }}">
-                    <button type="submit">Checkout</button>
-                </form>
-                {% endif %}
-            </div>
-        </section>
-        <div class="payment-card">
+    <h2>Ringkasan</h2>
+
+    <div class="summary">
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <strong>Rp {{ keranjang.subtotal }}</strong>
+        </div>
+
+        <div class="summary-row">
+            <span>Promo Diskon {{ keranjang.diskon_persen }}%</span>
+            <strong>Rp {{ keranjang.diskon }}</strong>
+        </div>
+
+        <div class="summary-row summary-total">
+            <span>Total Bayar</span>
+            <strong>Rp {{ keranjang.total }}</strong>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a class="button-link" href="{{ url_for('transaksi') }}">
+            Tambah Produk
+        </a>
+
+        {% if keranjang.daftar_item %}
+        <a class="danger-link" href="{{ url_for('kosongkan_keranjang') }}">
+            Kosongkan
+        </a>
+        {% endif %}
+    </div>
+</section>
+
+{% if keranjang.daftar_item %}
+<div class="payment-card">
     <h3>Pembayaran</h3>
 
     <div class="payment-info">
         <span>Total Belanja</span>
-        <strong>Rp {{ "{:,.0f}".format(keranjang.total).replace(",", ".") }}</strong>
+        <strong>Rp {{ keranjang.total }}</strong>
     </div>
 
-    <form method="post" action="{{ url_for('checkout_keranjang') }}">
+    <form method="post" action="{{ url_for('checkout_keranjang') }}" class="uang_bayar">
         <label>Uang Bayar</label>
+
         <input
             type="number"
             name="uang_bayar"
-            min="{{ keranjang.total }}"
+            min="0"
+            step="1"
             required
             placeholder="Masukkan uang pelanggan">
 
@@ -285,6 +301,8 @@
             Proses Pembayaran
         </button>
     </form>
+</div>
+{% endif %}
 </div>
     </div>
 </body>

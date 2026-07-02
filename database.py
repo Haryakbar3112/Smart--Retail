@@ -5,7 +5,7 @@ cursor = conn.cursor()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     username TEXT,
     password TEXT,
     role TEXT
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users(
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS produk(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     nama_produk TEXT,
     harga_modal INTEGER,
     harga_jual INTEGER,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS produk(
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS transaksi(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     produk_id INTEGER,
     jumlah INTEGER,
     total INTEGER,

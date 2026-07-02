@@ -57,6 +57,50 @@
             margin-top: 0;
         }
 
+        .report-toggle {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .report-toggle a {
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            color: #cbd5e1;
+            background: rgba(15, 23, 42, 0.8);
+            font-weight: 600;
+        }
+
+        .report-toggle a.active {
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            color: #0b1120;
+            border-color: transparent;
+        }
+
+        .report-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .report-actions a {
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            color: #0b1120;
+            font-weight: 700;
+        }
+
+        .report-note {
+            margin: 0 0 20px;
+            color: #cbd5e1;
+        }
+
         .stat-value {
             font-size: 2rem;
             margin: 10px 0 0;
@@ -105,6 +149,15 @@
                 <a href="{{ url_for('logout') }}">Logout</a>
             </nav>
         </header>
+
+        <div class="report-toggle">
+            <a class="{{ 'active' if periode == 'harian' else '' }}" href="{{ url_for('laporan', periode='harian') }}">Laporan Harian</a>
+            <a class="{{ 'active' if periode == 'mingguan' else '' }}" href="{{ url_for('laporan', periode='mingguan') }}">Laporan Mingguan</a>
+        </div>
+        <div class="report-actions">
+            <a href="{{ url_for('laporan_csv', periode=periode) }}">Unduh CSV</a>
+        </div>
+        <p class="report-note">Menampilkan data untuk: <strong>{{ periode_label }}</strong></p>
 
         <div class="grid">
             <div class="card">
