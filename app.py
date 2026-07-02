@@ -1,7 +1,11 @@
 ﻿import os
+<<<<<<< HEAD
 import csv
 from io import StringIO
 from flask import Flask, render_template, request, redirect, url_for, session, Response
+=======
+from flask import Flask, render_template, request, redirect, url_for, session
+>>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 from datetime import datetime
@@ -168,6 +172,7 @@ def require_admin():
         return redirect(url_for("dashboard"))
 
 
+<<<<<<< HEAD
 def get_laporan_periode(periode):
     periode = (periode or "harian").lower()
     if periode == "mingguan":
@@ -180,6 +185,8 @@ def get_laporan_periode(periode):
     return periode, where_clause, periode_label
 
 
+=======
+>>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
 initialize_database()
 
 
@@ -487,6 +494,7 @@ def checkout_keranjang():
             user=get_user(),
         )
 
+<<<<<<< HEAD
     uang_bayar_raw = request.form.get("uang_bayar", "").strip()
     try:
         uang_bayar = int(uang_bayar_raw)
@@ -509,6 +517,8 @@ def checkout_keranjang():
             user=get_user(),
         )
 
+=======
+>>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
     for item in ringkasan_keranjang["daftar_item"]:
         produk_item = conn.execute(
             "SELECT stok FROM produk WHERE id = ?", (item["produk_id"],)
@@ -640,6 +650,7 @@ def laporan():
     if redirect_result:
         return redirect_result
 
+<<<<<<< HEAD
     periode, where_clause, periode_label = get_laporan_periode(request.args.get("periode", "harian"))
 
     conn = get_db_connection()
@@ -652,6 +663,18 @@ def laporan():
     terlaris = conn.execute(
         f"SELECT p.nama_produk, SUM(t.jumlah) AS jumlah_terjual, SUM(t.total) AS pendapatan "
         f"FROM transaksi t JOIN produk p ON p.id = t.produk_id {where_clause} "
+=======
+    conn = get_db_connection()
+    total_transaksi = conn.execute("SELECT COUNT(*) AS total FROM transaksi").fetchone()["total"]
+    total_pendapatan = conn.execute("SELECT COALESCE(SUM(total), 0) AS total FROM transaksi").fetchone()["total"]
+    total_produk = conn.execute("SELECT COUNT(*) AS total FROM produk").fetchone()["total"]
+    total_keuntungan = conn.execute(
+        "SELECT COALESCE(SUM((p.harga_jual - p.harga_modal) * t.jumlah), 0) AS total FROM transaksi t JOIN produk p ON p.id = t.produk_id"
+    ).fetchone()["total"]
+    terlaris = conn.execute(
+        "SELECT p.nama_produk, SUM(t.jumlah) AS jumlah_terjual, SUM(t.total) AS pendapatan "
+        "FROM transaksi t JOIN produk p ON p.id = t.produk_id "
+>>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
         "GROUP BY p.id ORDER BY jumlah_terjual DESC LIMIT 5"
     ).fetchall()
     stok_rendah = conn.execute("SELECT * FROM produk WHERE stok <= 5 ORDER BY stok ASC").fetchall()
@@ -665,12 +688,16 @@ def laporan():
         total_produk=total_produk,
         terlaris=terlaris,
         stok_rendah=stok_rendah,
+<<<<<<< HEAD
         periode=periode,
         periode_label=periode_label,
+=======
+>>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
         user=get_user(),
     )
 
 
+<<<<<<< HEAD
 @app.route("/laporan/csv")
 def laporan_csv():
     redirect_result = require_login()
@@ -700,6 +727,8 @@ def laporan_csv():
     return response
 
 
+=======
+>>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
 @app.route("/logout")
 def logout():
     session.clear()
