@@ -324,20 +324,11 @@
             name="uang_bayar"
             min="0"
             step="1"
-
+        >
         <strong>Rp {{ "{:,.0f}".format(keranjang.total).replace(",", ".") }}</strong>
     </div>
 
     <form method="post" action="{{ url_for('checkout_keranjang') }}">
-        <label>Uang Bayar</label>
-        <input
-            type="number"
-            name="uang_bayar"
-            min="{{ keranjang.total }}"
-
-            required
-            placeholder="Masukkan uang pelanggan">
-
         <button type="submit">
             Proses Pembayaran
         </button>
@@ -346,6 +337,7 @@
 
 {% endif %}
 </div>
+
 
     </div>
 </body>
