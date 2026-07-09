@@ -184,13 +184,12 @@
         .payment-card button:hover{
             background:#218838;
         }
-<<<<<<< HEAD
+
         .uang_bayar{
             color:#000;
             
         }
-=======
->>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
+
     </style>
 </head>
 <body>
@@ -246,7 +245,7 @@
         </section>
 
         <section class="card">
-<<<<<<< HEAD
+
     <h2>Ringkasan</h2>
 
     <div class="summary">
@@ -281,7 +280,7 @@
 
 {% if keranjang.daftar_item %}
 <div class="payment-card">
-=======
+
             <h2>Ringkasan</h2>
             <div class="summary">
                 <div class="summary-row">
@@ -308,12 +307,12 @@
             </div>
         </section>
         <div class="payment-card">
->>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
+
     <h3>Pembayaran</h3>
 
     <div class="payment-info">
         <span>Total Belanja</span>
-<<<<<<< HEAD
+
         <strong>Rp {{ keranjang.total }}</strong>
     </div>
 
@@ -325,7 +324,7 @@
             name="uang_bayar"
             min="0"
             step="1"
-=======
+
         <strong>Rp {{ "{:,.0f}".format(keranjang.total).replace(",", ".") }}</strong>
     </div>
 
@@ -335,7 +334,7 @@
             type="number"
             name="uang_bayar"
             min="{{ keranjang.total }}"
->>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
+
             required
             placeholder="Masukkan uang pelanggan">
 
@@ -344,11 +343,10 @@
         </button>
     </form>
 </div>
-<<<<<<< HEAD
+
 {% endif %}
 </div>
-=======
->>>>>>> c0a3f9e9eb619b49ca8fde9b933dc51890efacb8
+
     </div>
 </body>
 </html>
